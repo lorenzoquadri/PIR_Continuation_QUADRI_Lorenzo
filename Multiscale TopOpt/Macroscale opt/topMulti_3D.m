@@ -42,7 +42,7 @@ switch problem
         % USER-DEFINED LOAD DOFs
         [il1,jl1,kl1] = meshgrid(nelx,0,0:nelz);                  % Coordinates
         loadnid = kl1*(nelx+1)*(nely+1)+il1*(nely+1)+(nely+1-jl1); % Node IDs
-        loaddof = 2*loadnid(:) ; % DOFs
+        loaddof = 3*loadnid(:)-1 ; % DOFs
         % USER-DEFINED SUPPORT FIXED DOFs
         [if1,jf1,kf1] = meshgrid(0,0:nely,0:nelz);                  % Coordinates
         fixednid_1 = kf1*(nelx+1)*(nely+1)+if1*(nely+1)+(nely+1-jf1); % Node IDs
@@ -533,7 +533,8 @@ ke_dxcub31 = zeros(24);
 [i, j, k] = meshgrid(1:3, 1:3, 1:3);
 
 for m = 1:27
-    ke = ke + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxdens * B(x(i(m)),  x(j(m)), x(k(m)));
+    ke = ke + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D * B(x(i(m)),  x(j(m)), x(k(m)));
+    ke_dxdens = ke_dxdens + w(i(m))*w(j(m))*B(x(i(m)), x(j(m)))' * D_dxdens * B(x(i(m)), x(j(m)));
     ke_dxor1 = ke_dxor1 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor1 * B(x(i(m)), x(j(m)), x(k(m)));
     ke_dxor2 = ke_dxor2 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor2 * B(x(i(m)), x(j(m)), x(k(m)));
     ke_dxor3 = ke_dxor3 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor3 * B(x(i(m)), x(j(m)), x(k(m)));
