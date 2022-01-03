@@ -9,6 +9,9 @@ s3=sin(theta3); %phi
 c3=cos(theta3);
 % Mrot=[[c1*c2*c3-s1*s3 -c1*c2*s3-s1*c3 c1*s2];[s1*c2*c3+c1*s3 -s1*c2*s3+c1*c3 s1*s2];[-s2*c3 s2*s3 c2]];
 Mrot=[[c3*c2 c3*s2*s1-s3*c1 c3*s2*c1+s3*s1];[s3*c2 s3*s2*s1+c3*c2 s3*s2*c1-c3*s1];[-s2 c2*s1 c2*c1]];
+% Extrinsic rotation whose improper euler angles are theta1,theta2,theta3
+% about axes x,y,z and it's the result of combining three rotation
+% matrices: R=Rz(theta3),Ry(theta2)Rx(theta1)
 
 tensA=zeros(3,3,3,3);
 tensA(1,1,:,:)=[[A(1,1) A(1,6) A(1,5)];[A(1,6) A(1,2) A(1,4)];[A(1,5) A(1,4) A(1,3)]];

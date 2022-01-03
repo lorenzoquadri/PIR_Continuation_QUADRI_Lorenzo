@@ -1,3 +1,4 @@
+% [tens,obj,micro]=unitCell8tz_3D(20,20,20,0.3,3,1.5,2,0,0,0,1,0,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,0,0,25,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(4,4,4,0.5,3,1.5,2,0,0,0,0,0,25,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,0,0,1,0.5);
@@ -31,8 +32,21 @@
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,1,0,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,0,1,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,1,1,1,0.5);
+
+% COMPARE WITH OPTIMISED
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,0,0,0,1,0.5);
+
+% DEFINITION OF ROTATIONS
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,0.5,0,0,1,0.5); %rotz=pi/8
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,1.5,0,0,1,0.5); %rotz=3pi/8
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,2.5,0,0,1,0.5); %rotz=5pi/8
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,3.5,0,0,1,0.5); %rotz=7pi/8
+%[tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,-1.5,0,0,1,0.5); %rotz=-3pi/8
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,1,0,0,0,1,0.5); %roty=2pi/8 
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,3,0,0,0,1,0.5); %roty=6pi/8 
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
 function [tens,obj,micro]=unitCell8tz_3D(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
+tic
 %density : 0 for void, 1 for full material
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
@@ -339,7 +353,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     
     %% PRINT RESULTS
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
-    clf;
-    display_3D(xPhys);
-    
+   clf;
+   display_3D(xPhys);
+   
 end
+toc
+save('micro.mat','micro');
