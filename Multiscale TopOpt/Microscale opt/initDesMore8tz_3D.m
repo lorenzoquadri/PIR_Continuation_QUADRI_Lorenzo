@@ -846,4 +846,4 @@ else
     error('initDes should be in 1..24')
 end
 figure(1)
-display_3D(x)
+%display_3D(x)

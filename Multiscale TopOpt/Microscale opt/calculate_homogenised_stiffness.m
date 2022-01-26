@@ -2,12 +2,12 @@ clear
 clc
 close all
 
-nelx=9;
-nely=9;
-nelz=9;
+nelx=30;
+nely=30;
+nelz=30;
 angle1=0;
 angle2=0;
-angle3=3/8*pi;
+angle3=0;
 transmiLim=0.5;
 penal=3;
 %% MATERIAL PROPERTIES
@@ -53,7 +53,8 @@ dQ = cell(6,6);
 
 % Verification generating a random density distribution, making it central
 % symmetric
-x = rand(9,9,9);
+% x = rand(9,9,9);
+x=initDesMore8tz_3D(nelx,nely,nelz,0.3,4,7);
 x=(x+flip(fliplr(flipud(x)),3))/2; %make design central symmetric
 % x=fliplr(x); % find symmetric wrt plane yz
 xPhys = x;

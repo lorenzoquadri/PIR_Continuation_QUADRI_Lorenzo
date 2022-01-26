@@ -2,7 +2,7 @@
 % [tens,obj,micro]=unitCell8tz_3D_optimised(9,9,9,0.5,3,1.5,1,0,0,0,0.2,200,0,0,0,0,0,1,0.5);
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
 function [tens,obj,micro]=unitCell8tz_3D_optimised(nelx,nely,nelz,density,penal,rmin,ft,ftBC,eta,beta,move,maxit, angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
-tic
+%tic
 %density : 0 for void, 1 for full material
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
@@ -45,6 +45,7 @@ Ke = keGen_optimised(nu);                                                       
 Ke0( tril( ones( 24 ) ) == 1 ) = Ke';
 Ke0 = reshape( Ke0, 24, 24 );
 Ke0 = Ke0 + Ke0' - diag( diag( Ke0 ) );                                    % recover full matrix
+
 % %
 % %% DEFINE IMPLICIT FUNCTIONS
 % prj = @(v,eta,beta) (tanh(beta*eta)+tanh(beta*(v(:)-eta)))./...
@@ -55,45 +56,49 @@ Ke0 = Ke0 + Ke0' - diag( diag( Ke0 ) );                                    % rec
 % cnt = @(v,vCnt,l) v+(l>=vCnt{1}).*(v<vCnt{2}).*(mod(l,vCnt{3})==0).*vCnt{4};
 % %
 %% PREPARE FILTER
-[dy,dx,dz]=meshgrid(-ceil(rmin)+1:ceil(rmin)-1,...
-    -ceil(rmin)+1:ceil(rmin)-1,-ceil(rmin)+1:ceil(rmin)-1 );
-h = max( 0, rmin - sqrt( dx.^2 + dy.^2 + dz.^2 ) );                        % conv. kernel #3D#
-iH = ones(nelx*nely*nelz*(2*(ceil(rmin)-1)+1)^2,1);
-jH = ones(size(iH));
-sH = zeros(size(iH));
-% H = sparse(iH,jH,sH);
-Hs = imfilter( ones( nely, nelx, nelz ), h, bcF );                         % matrix of weights (filter)  #3D#
-dHs = Hs;
+
+% [dy,dx,dz]=meshgrid(-ceil(rmin)+1:ceil(rmin)-1,...
+%     -ceil(rmin)+1:ceil(rmin)-1,-ceil(rmin)+1:ceil(rmin)-1 );
+% h = max( 0, rmin - sqrt( dx.^2 + dy.^2 + dz.^2 ) );                        % conv. kernel #3D#
+% iH = ones(nelx*nely*nelz*(2*(ceil(rmin)-1)+1)^2,1);
+% jH = ones(size(iH));
+% sH = zeros(size(iH));
+% % H = sparse(iH,jH,sH);
+% Hs = imfilter( ones( nely, nelx, nelz ), h, bcF );                         % matrix of weights (filter)  #3D#
+% dHs = Hs;
+
 % %
 % %% ALLOCATE AND INITIALIZE OTHER PARAMETERS
 % [ dsK, dV ] = deal( zeros( nEl, 1 ) );                                  % initialize vectors
 % dV( :, 1 ) = 1/nEl/volfrac;                                              % derivative of volume
 % [xOld, change, loop, U ] = deal(1, 1, 0, zeros(3*nEl,6) );       % old x, x change, it. counter, U
 % %
-% iH = ones(nelx*nely*nelz*(2*(ceil(rmin)-1)+1)^2,1);
-% jH = ones(size(iH));
-% sH = zeros(size(iH));
-% k = 0;
-% for k1 = 1:nelz
-%     for i1 = 1:nelx
-%         for j1 = 1:nely
-%             e1 = (k1-1)*nelx*nely + (i1-1)*nely+j1;
-%             for k2 = max(k1-(ceil(rmin)-1),1):min(k1+(ceil(rmin)-1),nelz)
-%                 for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nelx)
-%                     for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nely)
-%                         e2 = (k2-1)*nelx*nely + (i2-1)*nely+j2;
-%                         k = k+1;
-%                         iH(k) = e1;
-%                         jH(k) = e2;
-%                         sH(k) = max(0,rmin-sqrt((i1-i2)^2+(j1-j2)^2+(k1-k2)^2));
-%                     end
-%                 end
-%             end
-%         end
-%     end
-% end
-% H = sparse(iH,jH,sH);
-% Hs = sum(H,2);
+% 
+iH = ones(nelx*nely*nelz*(2*(ceil(rmin)-1)+1)^2,1);
+jH = ones(size(iH));
+sH = zeros(size(iH));
+k = 0;
+for k1 = 1:nelz
+    for i1 = 1:nelx
+        for j1 = 1:nely
+            e1 = (k1-1)*nelx*nely + (i1-1)*nely+j1;
+            for k2 = max(k1-(ceil(rmin)-1),1):min(k1+(ceil(rmin)-1),nelz)
+                for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nelx)
+                    for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nely)
+                        e2 = (k2-1)*nelx*nely + (i2-1)*nely+j2;
+                        k = k+1;
+                        iH(k) = e1;
+                        jH(k) = e2;
+                        sH(k) = max(0,rmin-sqrt((i1-i2)^2+(j1-j2)^2+(k1-k2)^2));
+                    end
+                end
+            end
+        end
+    end
+end
+H = sparse(iH,jH,sH);
+Hs = sum(H,2);
+dHs = Hs;
 %% PERIODIC BOUNDARY CONDITIONS
 e0 = eye(6);
 ufixed = zeros(24,6);
@@ -333,8 +338,8 @@ while (change > 1e-6 && loop < maxit && inLoop==1) || inLoop==2
 %     xOld = xPhys; 
 %     %
     if ft==1 %sensitivity
-        %dc(:) = H*(x(:).*dc(:))./Hs./max(1e-3,x(:));
-        dc = imfilter( reshape( dc, nely, nelz, nelx ) ./ dHs, h, bcF );         % filter objective sens.      #3D#
+        dc(:) = H*(x(:).*dc(:))./Hs./max(1e-3,x(:));
+        %dc = imfilter( reshape( dc, nely, nelz, nelx ) ./ dHs, h, bcF );         % filter objective sens.      #3D#
     elseif ft == 2 % density
         dc(:) = H*(dc(:)./Hs);
         dv(:) = H*(dv(:)./Hs);
@@ -395,7 +400,7 @@ while (change > 1e-6 && loop < maxit && inLoop==1) || inLoop==2
     %% PRINT RESULTS
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
     clf;
-    display_3D(xPhys);
+    %display_3D(xPhys);
     
 end
-toc
+

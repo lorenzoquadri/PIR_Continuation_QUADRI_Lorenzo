@@ -14,7 +14,7 @@
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,2,-1,1,0,1,0.5);shear
 
 % TESTS
-% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0,3,1.5,2,0,0,0,0,0,1,0.5);
+% [tens,obj,micro]=unitCell8tz_3D_optimised(9,9,9,0.5,3,1.5,1,0,0,0,0.2,200,0,0,0,0,0,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.2,3,1.5,2,0,0,0,0,0,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.4,3,1.5,2,0,0,0,0,0,1,0.5);
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.6,3,1.5,2,0,0,0,0,0,1,0.5);
@@ -34,7 +34,7 @@
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,2,0,0,0,1,1,1,0.5);
 
 % COMPARE WITH OPTIMISED
-% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,0,0,0,1,0.5);
+% [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.5,3,1.5,1,0,0,0,0,0,1,0.5);
 
 % DEFINITION OF ROTATIONS
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,0,0.5,0,0,1,0.5); %rotz=pi/8
@@ -46,7 +46,7 @@
 % [tens,obj,micro]=unitCell8tz_3D(9,9,9,0.3,3,1.5,1,0,3,0,0,0,1,0.5); %roty=6pi/8 
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
 function [tens,obj,micro]=unitCell8tz_3D(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
-tic
+
 %density : 0 for void, 1 for full material
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
@@ -284,7 +284,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         
     %% FE-ANALYSIS
     sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
+
     K = sparse(iK,jK,sK); K = (K+K')/2;
+
     Kr = [K(d2,d2), K(d2,d3)+K(d2,d4);K(d3,d2)+K(d4,d2), K(d3,d3)+K(d3,d4)+K(d4,d3)+K(d4,d4)];
     U(d1,:) = ufixed;
     U([d2,d3],:) = Kr\(-[K(d2,d1);K(d3,d1)+K(d4,d1)]*ufixed-[K(d2,d4); K(d3,d4)+K(d4,d4)]*wfixed);
@@ -354,8 +356,8 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     %% PRINT RESULTS
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
    clf;
-   display_3D(xPhys);
+   %display_3D(xPhys);
    
 end
-toc
+
 save('micro.mat','micro');

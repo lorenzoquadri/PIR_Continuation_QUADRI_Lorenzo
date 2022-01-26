@@ -2,14 +2,24 @@
 %derivatives
 function B=rotateTensorCells_3D(A,theta1,theta2,theta3)
 B=cell(6,6);
-s1=sin(theta1); %psi
-c1=cos(theta1);
+s1=sin(theta3); %psi
+c1=cos(theta3);
 s2=sin(theta2); %theta
 c2=cos(theta2);
-s3=sin(theta3); %phi
-c3=cos(theta3);
+s3=sin(theta1); %phi
+c3=cos(theta1);
 %Mrot=[[c1*c2*c3-s1*s3 -c1*c2*s3-s1*c3 c1*s2];[s1*c2*c3+c1*s3 -s1*c2*s3+c1*c3 s1*s2];[-s2*c3 s2*s3 c2]];
-Mrot=[[c3*c2 c3*s2*s1-s3*c1 c3*s2*c1+s3*s1];[s3*c2 s3*s2*s1+c3*c1 s3*s2*c1-c3*s1];[-s2 c2*s1 c2*c1]];
+
+% Mrot=[[c3*c2 c3*s2*s1-s3*c1 c3*s2*c1+s3*s1];[s3*c2 s3*s2*s1+c3*c1 s3*s2*c1-c3*s1];[-s2 c2*s1 c2*c1]];
+% Extrinsic rotation whose improper euler angles are theta1,theta2,theta3
+% about axes x,y,z and it's the result of combining three rotation
+% matrices: R=Rz(theta3),Ry(theta2)Rx(theta1)
+
+Mrot=[[c2*c3 -c2*s3 s2];[c1*s3+c3*s1*s2 c1*c3-s1*s2*s3 -c2*s1];[s1*s3-c1*c3*s2 c3*s1+c1*s2*s3 c1*c2]];
+% Intrinsic rotation whose euler angles are theta1,theta2,theta3
+% about intrinsic axes z-y'-x'', which corresponds to a chained rotation 
+% about extrinsic axis x-y-z. It's the result of combining three rotation
+% matrices: R=Rz(theta3),Ry(theta2)Rx(theta1)
 
 tensA=cell(3,3,3,3);
 tensA(1,1,:,:)={A{1,1} A{1,6} A{1,5};A{1,6} A{1,2} A{1,4};A{1,5} A{1,4} A{1,3}};
