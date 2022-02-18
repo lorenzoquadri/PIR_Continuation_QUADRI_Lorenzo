@@ -206,51 +206,64 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     end
     
     %moved n, d and wfixed here, to adapt to size of used side of cell
-
-% %     one matrix next to the other w/o reshaping
-%     %n3 = [nodenrs(2:farthestUsedx0y0,1)',nodenrs(farthestUsedx0y1+1:farthestUsedx0y2+1,1)',nodenrs(farthestUsedx0y3+1:farthestUsedx0y4+1,1)',nodenrs(farthestUsedx0yM+1:nely,1)',nodenrs(end,2:farthestUsedy0x0),nodenrs(end,farthestUsedy0x1+1:farthestUsedy0x2+1),nodenrs(end,farthestUsedy0x3+1:farthestUsedy0x4+1),nodenrs(end,farthestUsedy0xM+1:nelx)];
-%     n3_matrix = [nodenrs(1:farthestUsedx0y0z0,2:farthestUsedy0x0z0,1),nodenrs(farthestUsedx0yMz0:nely+1,2:farthestUsedy0x0z0,1),nodenrs(farthestUsedx0yMz0:nely+1,farthestUsedy0xMz0:nelx,1),nodenrs(1:farthestUsedx0y0z0,farthestUsedy0xMz0:nelx,1),... %front
-%         permute(nodenrs(2:farthestUsedx0y0z0,1,1:farthestUsedz0x0y0),[3,1,2]),permute(nodenrs(farthestUsedx0yMz0:nely,1,1:farthestUsedz0x0y0),[3,1,2]),permute(nodenrs(farthestUsedx0yMz0:nely,1,farthestUsedzMx0y0:nelz+1),[3,1,2]),permute(nodenrs(2:farthestUsedx0y0z0,1,farthestUsedzMx0y0:nelz+1),[3,1,2]),... %left
-%         permute(nodenrs(nely+1,1:farthestUsedy0x0z0,2:farthestUsedz0x0y0),[2,3,1]),permute(nodenrs(nely+1,farthestUsedy0xMz0:nelx+1,2:farthestUsedz0x0y0),[2,3,1]),permute(nodenrs(nely+1,farthestUsedy0xMz0:nelx+1,farthestUsedzMx0y0:nelz),[2,3,1]),permute(nodenrs(nely+1,1:farthestUsedy0x0z0,farthestUsedzMx0y0:nelz),[2,3,1])]; %bottom
-%     n3=reshape(n3_matrix,size(n3_matrix,1)*size(n3_matrix,2),1);
-%     d3 = reshape([(3*n3-2);(3*n3-1);3*n3],1,3*size(n3,1)); 
-%     n4_matrix = [nodenrs(1:farthestUsedx0y0z0,2:farthestUsedy0x0z0,nelz+1),nodenrs(farthestUsedx0yMz0:nely+1,2:farthestUsedy0x0z0,nelz+1),nodenrs(farthestUsedx0yMz0:nely+1,farthestUsedy0xMz0:nelx,nelz+1),nodenrs(1:farthestUsedx0y0z0,farthestUsedy0xMz0:nelx,nelz+1),... %rear
-%         permute(nodenrs(2:farthestUsedx0y0z0,nelx+1,1:farthestUsedz0x0y0),[3,1,2]),permute(nodenrs(farthestUsedx0yMz0:nely,nelx+1,1:farthestUsedz0x0y0),[3,1,2]),permute(nodenrs(farthestUsedx0yMz0:nely,nelx+1,farthestUsedzMx0y0:nelz+1),[3,1,2]),permute(nodenrs(2:farthestUsedx0y0z0,nelx+1,farthestUsedzMx0y0:nelz+1),[3,1,2]),... % right
-%         permute(nodenrs(1,1:farthestUsedy0x0z0,2:farthestUsedz0x0y0),[2,3,1]),permute(nodenrs(1,farthestUsedy0xMz0:nelx+1,2:farthestUsedz0x0y0),[2,3,1]),permute(nodenrs(1,farthestUsedy0xMz0:nelx+1,farthestUsedzMx0y0:nelz),[2,3,1]),permute(nodenrs(1,1:farthestUsedy0x0z0,farthestUsedzMx0y0:nelz),[2,3,1])]; %top
-%     n4=reshape(n4_matrix,size(n4_matrix,1)*size(n4_matrix,2),1);
-%     d4 = reshape([(3*n4-2);(3*n4-1);3*n4],1,3*size(n4,1)); 
-%     d2 = setdiff(alldofs,[d1,d3,d4]);
-%     
     
-    n3_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... %left
-        reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %bottom
-        reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,1),[],1)]'; %front
-    idx3 = ~ismember(n3_with_n1',n1','rows');
-    n3 = n3_with_n1(idx3);
+%     n3_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... %left
+%         reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %bottom
+%         reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,1),[],1)]'; %front
+%     idx3 = ~ismember(n3_with_n1',n1','rows');
+%     n3 = n3_with_n1(idx3);
+%     d3 = reshape([(3*n3-2);(3*n3-1);3*n3],1,3*size(n3,2)); 
+%     n4_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... % right
+%         reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %top
+%         reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1)]'; %rear
+%     idx4 = ~ismember(n4_with_n1',n1','rows');
+%     n4 = n4_with_n1(idx4);
+%     d4 = reshape([(3*n4-2);(3*n4-1);3*n4],1,3*size(n4,2)); 
+
+    n3 = [reshape(nodenrs(nely+1,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx,1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,1,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,1,1),[],1);reshape(permute(nodenrs(nely+1,1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nely+1,1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
     d3 = reshape([(3*n3-2);(3*n3-1);3*n3],1,3*size(n3,2)); 
-    n4_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... % right
-        reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %top
-        reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1)]'; %rear
-    idx4 = ~ismember(n4_with_n1',n1','rows');
-    n4 = n4_with_n1(idx4);
+    n4 = [reshape(nodenrs(1,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(1,nfarthestUsedy0xMz0:nelx,1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,nelx+1,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,nelx+1,1),[],1);reshape(permute(nodenrs(nely+1,nelx+1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nely+1,nelx+1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
     d4 = reshape([(3*n4-2);(3*n4-1);3*n4],1,3*size(n4,2)); 
-    d2 = setdiff(alldofs,[d1,d3,d4]);
+    n5 = [reshape(nodenrs(1,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(1,nfarthestUsedy0xMz0:nelx,nelz+1),[],1);reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,nelx+1,nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,nelx+1,nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1,nelx+1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(1,nelx+1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
+    d5 = reshape([(3*n5-2);(3*n5-1);3*n5],1,3*size(n5,2)); 
+    n6 = [reshape(nodenrs(nely+1,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx,nelz+1),[],1);reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,1,nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,1,nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1,1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(1,1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
+    d6 = reshape([(3*n6-2);(3*n6-1);3*n6],1,3*size(n6,2)); 
+    n7 = [reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1);reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1);... %left
+         reshape(permute(nodenrs(nely+1,2:nfarthestUsedy0x0z0,2:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx,2:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx,nfarthestUsedzMx0y0:nelz),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,2:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz),[2,3,1]),[],1);... %bottom
+         reshape(nodenrs(2:nfarthestUsedx0y0z0,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,nfarthestUsedy0xMz0:nelx,1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx,1),[],1)]'; %front
+    d7 = reshape([(3*n7-2);(3*n7-1);3*n7],1,3*size(n7,2)); 
+    n8 = [reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,nelx+1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,nelx+1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely,nelx+1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1);reshape(permute(nodenrs(2:nfarthestUsedx0y0z0,nelx+1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1);... % right
+        reshape(permute(nodenrs(1,2:nfarthestUsedy0x0z0,2:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx,2:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx,nfarthestUsedzMx0y0:nelz),[2,3,1]),[],1);reshape(permute(nodenrs(1,2:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz),[2,3,1]),[],1);... %top
+        reshape(nodenrs(2:nfarthestUsedx0y0z0,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,nfarthestUsedy0xMz0:nelx,nelz+1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx,nelz+1),[],1)]'; %rear
+    d8 = reshape([(3*n8-2);(3*n8-1);3*n8],1,3*size(n8,2));  
+    d2 = setdiff(alldofs,[d1,d3,d4,d5,d6,d7,d8]);
        
     % wfixed = [repmat(ufixed(4:6,:),(farthestUsedy0x0z0+nelx+1-farthestUsedy0xMz0)*(farthestUsedz0x0y0+nelz+1-farthestUsedzMx0y0)-1,1); repmat(ufixed(10:12,:),(farthestUsedx0y0z0+nely+1-farthestUsedx0yMz0)*(farthestUsedz0x0y0+nelz+1-farthestUsedzMx0y0)-1,1); repmat(ufixed(13:15,:),(farthestUsedx0y0z0+nely+1-farthestUsedx0yMz0)*(farthestUsedz0x0y0+nelx+1-farthestUsedy0xMz0)-1,1)];
     % wfixed = [repmat(ufixed(4:6,:),(farthestUsedy0x0z0-1+nelx+1-farthestUsedy0xMz0)*(farthestUsedz0x0y0+nely+2-farthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(farthestUsedx0y0z0+nely+2-farthestUsedx0yMz0)*(farthestUsedz0x0y0-1+nelz+1-farthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(farthestUsedx0y0z0+nely+2-farthestUsedx0yMz0)*(farthestUsedz0x0y0-1+nelx+1-farthestUsedy0xMz0),1)];
     
-    wfixed = [repmat(ufixed(4:6,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(10:12,:),((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(13:15,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))-4,1)];
-        
+    % wfixed = [repmat(ufixed(4:6,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(10:12,:),((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(13:15,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))-4,1)];
+    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nely+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
+    
     %% FE-ANALYSIS
     sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
 
     K = sparse(iK,jK,sK); K = (K+K')/2;
 
-    Kr = [K(d2,d2), K(d2,d3)+K(d2,d4);K(d3,d2)+K(d4,d2), K(d3,d3)+K(d3,d4)+K(d4,d3)+K(d4,d4)];
+    Kr = [K(d2,d2), K(d2,d3)+K(d2,d4)+K(d2,d5)+K(d2,d6), K(d2,d7)+K(d2,d8);
+          K(d3,d2)+K(d4,d2)+K(d5,d2)+K(d6,d2), K(d3,d3)+K(d3,d4)+K(d3,d5)+K(d3,d6)+K(d4,d3)+K(d4,d4)+K(d4,d5)+K(d4,d6)+K(d5,d3)+K(d5,d4)+K(d5,d5)+K(d5,d6)+K(d6,d3)+K(d6,d4)+K(d6,d5)+K(d6,d6), K(d3,d7)+K(d3,d8)+K(d4,d7)+K(d4,d8)+K(d5,d7)+K(d5,d8)+K(d6,d7)+K(d6,d8);
+          K(d7,d2)+K(d8,d2), K(d7,d3)+K(d8,d3)+K(d7,d4)+K(d8,d4)+K(d7,d5)+K(d8,d5)+K(d7,d6)+K(d8,d6), K(d7,d7)+K(d7,d8)+K(d8,d7)+K(d8,d8)];
     U(d1,:) = ufixed;
-    U([d2,d3],:) = Kr\(-[K(d2,d1);K(d3,d1)+K(d4,d1)]*ufixed-[K(d2,d4); K(d3,d4)+K(d4,d4)]*wfixed);
+    Fr = -[K(d2,d1); K(d3,d1)+K(d4,d1)+K(d5,d1)+K(d6,d1); K(d7,d1)+K(d8,d1)]*U(d1,:)-[K(d2,d4);K(d3,d4)+K(d4,d4)+K(d5,d4)+K(d6,d4);K(d7,d4)+K(d8,d4)]*w1-[K(d2,d5);K(d3,d5)+K(d4,d5)+K(d5,d5)+K(d6,d5);K(d7,d5)+K(d8,d5)]*w2-[K(d2,d6);K(d3,d6)+K(d4,d6)+K(d5,d6)+K(d6,d6);K(d7,d6)+K(d8,d6)]*w3-[K(d2,d8);K(d3,d8)+K(d4,d8)+K(d5,d8)+K(d6,d8);K(d7,d8)+K(d8,d8)]*w4;
     
-    U(d4,:) = U(d3,:)+wfixed;
+    U([d2,d3,d7],:) = Kr\Fr;
+    
+    U(d4,:) = U(d3,:)+w1;
+    U(d5,:) = U(d3,:)+w2;
+    U(d6,:) = U(d3,:)+w3;
+    U(d8,:) = U(d7,:)+w4;
     
     % PLOT DEFORMATIONS
     if loop==1
