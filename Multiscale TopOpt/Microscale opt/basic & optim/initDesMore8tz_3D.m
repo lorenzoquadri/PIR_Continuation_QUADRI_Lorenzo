@@ -842,6 +842,19 @@ elseif initDes==25
     x(nely,:,1)=1;
     x(nely,:,nelz)=1;
     x(1,:,nelz)=1;
+% test case: to prove Poisson effect
+elseif initDes==26
+    x=ones(nely,nelx,nelz);
+    for i=1:nely
+        for j=2:nelx-1
+            for k=1:nelz
+                if (i==1||k==1||i==nely||k==nelz)
+                    x(i,j,k)=0;
+                end
+            end
+        end
+    end
+    
 else
     error('initDes should be in 1..24')
 end
@@ -857,6 +870,6 @@ for i=1:nelx
     end
 end
 
-rho=count/(nelx*nely*nelz)
+rho=count/(nelx*nely*nelz);
 figure(1)
 display_3D(x)

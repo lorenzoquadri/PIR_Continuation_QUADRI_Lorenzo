@@ -21,10 +21,10 @@ if nargin==4
     plot3(x_fin(1),z_fin(1),y_fin(1),'r*',x_fin(nely+1),z_fin(nely+1),y_fin(nely+1),'r*',x_fin((nely+1)*nelx+1),z_fin((nely+1)*nelx+1),y_fin((nely+1)*nelx+1),'r*',x_fin((nely+1)*(nelx+1)),z_fin((nely+1)*(nelx+1)),y_fin((nely+1)*(nelx+1)),'r*',...
         x_fin((nely+1)*(nelx+1)*nelz+1),z_fin((nely+1)*(nelx+1)*nelz+1),y_fin((nely+1)*(nelx+1)*nelz+1),'r*',x_fin((nely+1)*(nelx+1)*nelz+nely+1),z_fin((nely+1)*(nelx+1)*nelz+nely+1),y_fin((nely+1)*(nelx+1)*nelz+nely+1),'r*',x_fin((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),z_fin((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),y_fin((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),'r*',x_fin((nely+1)*(nelx+1)*(nelz+1)),z_fin((nely+1)*(nelx+1)*(nelz+1)),y_fin((nely+1)*(nelx+1)*(nelz+1)),'r*');
     
-%     plot3(x_in(:),z_in(:),y_in(:),'bo');
-%     plot3(x_in(1),z_in(1),y_in(1),'b*',x_in(nely+1),z_in(nely+1),y_in(nely+1),'b*',x_in((nely+1)*nelx+1),z_in((nely+1)*nelx+1),y_in((nely+1)*nelx+1),'b*',x_in((nely+1)*(nelx+1)),z_in((nely+1)*(nelx+1)),y_in((nely+1)*(nelx+1)),'b*',...
-%         x_in((nely+1)*(nelx+1)*nelz+1),z_in((nely+1)*(nelx+1)*nelz+1),y_in((nely+1)*(nelx+1)*nelz+1),'b*',x_in((nely+1)*(nelx+1)*nelz+nely+1),z_in((nely+1)*(nelx+1)*nelz+nely+1),y_in((nely+1)*(nelx+1)*nelz+nely+1),'b*',x_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),z_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),y_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),'b*',x_in((nely+1)*(nelx+1)*(nelz+1)),z_in((nely+1)*(nelx+1)*(nelz+1)),y_in((nely+1)*(nelx+1)*(nelz+1)),'b*');
-%     
+    plot3(x_in(:),z_in(:),y_in(:),'bo');
+    plot3(x_in(1),z_in(1),y_in(1),'b*',x_in(nely+1),z_in(nely+1),y_in(nely+1),'b*',x_in((nely+1)*nelx+1),z_in((nely+1)*nelx+1),y_in((nely+1)*nelx+1),'b*',x_in((nely+1)*(nelx+1)),z_in((nely+1)*(nelx+1)),y_in((nely+1)*(nelx+1)),'b*',...
+        x_in((nely+1)*(nelx+1)*nelz+1),z_in((nely+1)*(nelx+1)*nelz+1),y_in((nely+1)*(nelx+1)*nelz+1),'b*',x_in((nely+1)*(nelx+1)*nelz+nely+1),z_in((nely+1)*(nelx+1)*nelz+nely+1),y_in((nely+1)*(nelx+1)*nelz+nely+1),'b*',x_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),z_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),y_in((nely+1)*(nelx+1)*nelz+(nely+1)*nelx+1),'b*',x_in((nely+1)*(nelx+1)*(nelz+1)),z_in((nely+1)*(nelx+1)*(nelz+1)),y_in((nely+1)*(nelx+1)*(nelz+1)),'b*');
+    
     set(gcf,'Name','ISO display','NumberTitle','off');
     set(gca, 'ZDir','reverse');
 
