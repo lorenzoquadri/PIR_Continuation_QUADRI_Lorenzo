@@ -1,12 +1,12 @@
 %rotate a 6x6 matrix representing a 4th order 3*3*3*3 elastic tensor
 function B=rotateTensorMatrix_3D(A,theta1,theta2,theta3)
 B=zeros(6,6);
-s1=sin(theta3);
-c1=cos(theta3);
+s1=sin(theta1);
+c1=cos(theta2);
 s2=sin(theta2);
 c2=cos(theta2);
-s3=sin(theta1);
-c3=cos(theta1);
+s3=sin(theta3);
+c3=cos(theta3);
 % Mrot=[[c1*c2*c3-s1*s3 -c1*c2*s3-s1*c3 c1*s2];[s1*c2*c3+c1*s3 -s1*c2*s3+c1*c3 s1*s2];[-s2*c3 s2*s3 c2]];
 
 % Mrot=[[c3*c2 c3*s2*s1-s3*c1 c3*s2*c1+s3*s1];[s3*c2 s3*s2*s1+c3*c2 s3*s2*c1-c3*s1];[-s2 c2*s1 c2*c1]];

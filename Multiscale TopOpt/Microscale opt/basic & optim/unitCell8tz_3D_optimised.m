@@ -2,7 +2,7 @@
 % [tens,obj,micro]=unitCell8tz_3D_optimised(9,9,9,0.5,3,1.5,1,0,0,0,0.2,200,0,0,0,0,0,1,0.5);
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
 function [tens,obj,micro]=unitCell8tz_3D_optimised(nelx,nely,nelz,density,penal,rmin,ft,ftBC,eta,beta,move,maxit, angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
-%tic
+tic
 %density : 0 for void, 1 for full material
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
@@ -29,9 +29,9 @@ if ftBC == 'N', bcF = 'symmetric'; else, bcF = 0; end                      % fil
 % %
 %% PREPARE FINITE ELEMENT ANALYSIS
 nEl = nelx * nely * nelz;                                                  % number of elements          #3D#
-nodeNrs = int32( reshape( 1 : ( 1 + nelx ) * ( 1 + nely ) * ( 1 + nelz ), ...
+nodenrs = int32( reshape( 1 : ( 1 + nelx ) * ( 1 + nely ) * ( 1 + nelz ), ...
     1 + nely, 1 + nelx, 1 + nelz ) );                                      % nodes numbering             #3D#
-cVec = reshape( 3 * nodeNrs( 1 : nely, 1 : nelx, 1 : nelz ) + 1, nEl, 1 ); %                             #3D#
+cVec = reshape( 3 * nodenrs( 1 : nely, 1 : nelx, 1 : nelz ) + 1, nEl, 1 ); %                             #3D#
 cMat = cVec+int32( [0 1 2 3*nely+[3 4 5 0 1 2] -3 -2 -1 3*(nelx+1)*(nely+1)+[0 1 2 3*nely+[3 4 5 0 1 2] -3 -2 -1]]);             % connectivity matrix         #3D#
 nDof = ( 1 + nely ) * ( 1 + nelz ) * ( 1 + nelx ) * 3;                     % total number of DOFs        #3D#
 [ sI, sII ] = deal( [ ] );
@@ -104,7 +104,7 @@ e0 = eye(6);
 ufixed = zeros(24,6);
 U = zeros(nDof,6);
 alldofs = int32(1:nDof);
-n1 = [nodeNrs(end,[1,end],1),nodeNrs(1,[end,1],1),nodeNrs(end,[1,end],end),nodeNrs(1,[end,1],end)];
+n1 = [nodenrs(end,[1,end],1),nodenrs(1,[end,1],1),nodenrs(end,[1,end],end),nodenrs(1,[end,1],end)];
 d1 = reshape([(3*n1-2);(3*n1-1);3*n1],1,24);
 for j = 1:6
     ufixed(4:6,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;0;0];
@@ -278,10 +278,11 @@ while (change > 1e-6 && loop < maxit && inLoop==1) || inLoop==2
     w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nely+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
    
     %% FE-ANALYSIS
-    sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
-
-    K = sparse(iK,jK,sK); K = (K+K')/2;
-
+    sK = ( Emin + xPhys(:).^penal * ( E0 - Emin ) );
+    sK = reshape( Ke( : ) * sK', length( Ke ) * nEl, 1 );                   % transform sK into matrix
+    K = fsparse( Iar( :, 1 ), Iar( :, 2 ), sK, [ nDof, nDof ] );  
+    K = K + K' - diag( diag( K ) ); K = (K+K')/2;                                   % recover full matrix
+    
     Kr = [K(d2,d2), K(d2,d3)+K(d2,d4)+K(d2,d5)+K(d2,d6), K(d2,d7)+K(d2,d8);
           K(d3,d2)+K(d4,d2)+K(d5,d2)+K(d6,d2), K(d3,d3)+K(d3,d4)+K(d3,d5)+K(d3,d6)+K(d4,d3)+K(d4,d4)+K(d4,d5)+K(d4,d6)+K(d5,d3)+K(d5,d4)+K(d5,d5)+K(d5,d6)+K(d6,d3)+K(d6,d4)+K(d6,d5)+K(d6,d6), K(d3,d7)+K(d3,d8)+K(d4,d7)+K(d4,d8)+K(d5,d7)+K(d5,d8)+K(d6,d7)+K(d6,d8);
           K(d7,d2)+K(d8,d2), K(d7,d3)+K(d8,d3)+K(d7,d4)+K(d8,d4)+K(d7,d5)+K(d8,d5)+K(d7,d6)+K(d8,d6), K(d7,d7)+K(d7,d8)+K(d8,d7)+K(d8,d8)];
@@ -295,14 +296,14 @@ while (change > 1e-6 && loop < maxit && inLoop==1) || inLoop==2
     U(d6,:) = U(d3,:)+w3;
     U(d8,:) = U(d7,:)+w4;
     
-%         % PLOT DEFORMATIONS
-%         if loop==1
-%             for i=1:6
-%                 figure()
-%                 plot_def(U(:,i),nelx,nely,nelz);
-%             end
-%         end
-%     
+        % PLOT DEFORMATIONS
+        if loop==1
+            for i=1:6
+                figure()
+                plot_def(U(:,i),nelx,nely,nelz);
+            end
+        end
+    
      
     %% OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
     for i = 1:6
@@ -398,6 +399,6 @@ while (change > 1e-6 && loop < maxit && inLoop==1) || inLoop==2
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
     clf;
     %display_3D(xPhys);
-    
+    toc
 end
 
