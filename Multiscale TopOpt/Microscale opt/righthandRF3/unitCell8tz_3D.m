@@ -1,9 +1,8 @@
-% [tens,obj,micro]=unitCell8tz_3D_righthandRF(10,10,10,0.3,3,1.5,2,0,0,0,0,0,1,0.5);
+% [tens,obj,micro]=unitCell8tz_3D(5,5,5,0.3,3,1.5,2,0,0,0,0,0,1,0.5);
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
-function [tens,obj,micro]=unitCell8tz_3D_righthandRF(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
-%tic
+function [tens,obj,micro]=unitCell8tz_3D(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
+tic
 %density : 0 for void, 1 for full material
-%anglePC : 
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
 %initDes : initial design : 1=all 0s; 2= all volfrac; 3= all 1; ...
@@ -12,8 +11,8 @@ volfrac=density;
 cubicity21=sqrt(cubicity21);
 cubicity31=sqrt(cubicity31);
 angle1=angle1*pi/2;
-angle2=angle2*pi/2;
-angle3=angle3*2*pi;
+angle2=-angle2*pi/2;
+angle3=-angle3*pi/2;
 
 %% MATERIAL PROPERTIES
 E0=1;
@@ -21,24 +20,24 @@ Emin=1e-9;
 nu=0.3;
 %% PREPARE FINITE ELEMENT ANALYSIS
 KE = keGen(nu);
-nodenrs = reshape(1:(1+nely)*(1+nelz)*(1+nelx),1+nelz,1+nely,1+nelx);
-edofVec = reshape(3*nodenrs(1:end-1,1:end-1,1:end-1)+1, nely*nelz*nelx,1);
-edofMat = repmat(edofVec,1,24)+repmat([0 1 2 3*nelz+[3 4 5 0 1 2] -3 -2 -1 3*(nely+1)*(nelz+1)+[0 1 2 3*nelz+[3 4 5 0 1 2] -3 -2 -1]],nely*nelz*nelx,1);
-iK = reshape(kron(edofMat,ones(24,1))',576*nely*nelz*nelx,1);
-jK = reshape(kron(edofMat,ones(1,24))',576*nely*nelz*nelx,1);
+nodenrs = reshape(1:(1+nelx)*(1+nely)*(1+nelz),1+nely,1+nelx,1+nelz);
+edofVec = reshape(3*nodenrs(1:end-1,1:end-1,1:end-1)+1, nelx*nely*nelz,1);
+edofMat = repmat(edofVec,1,24)+repmat([0 1 2 3*nely+[3 4 5 0 1 2] -3 -2 -1 3*(nelx+1)*(nely+1)+[0 1 2 3*nely+[3 4 5 0 1 2] -3 -2 -1]],nelx*nely*nelz,1);
+iK = reshape(kron(edofMat,ones(24,1))',576*nelx*nely*nelz,1);
+jK = reshape(kron(edofMat,ones(1,24))',576*nelx*nely*nelz,1);
 %% PREPARE FILTER
-iH = ones(nely*nelz*nelx*(2*(ceil(rmin)-1)+1)^2,1);
+iH = ones(nelx*nely*nelz*(2*(ceil(rmin)-1)+1)^2,1);
 jH = ones(size(iH));
 sH = zeros(size(iH));
 k = 0;
-for k1 = 1:nelx
-    for i1 = 1:nely
-        for j1 = 1:nelz
-            e1 = (k1-1)*nely*nelz + (i1-1)*nelz+j1;
-            for k2 = max(k1-(ceil(rmin)-1),1):min(k1+(ceil(rmin)-1),nelx)
-                for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nely)
-                    for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nelz)
-                        e2 = (k2-1)*nely*nelz + (i2-1)*nelz+j2;
+for k1 = 1:nelz
+    for i1 = 1:nelx
+        for j1 = 1:nely
+            e1 = (k1-1)*nelx*nely + (i1-1)*nely+j1;
+            for k2 = max(k1-(ceil(rmin)-1),1):min(k1+(ceil(rmin)-1),nelz)
+                for i2 = max(i1-(ceil(rmin)-1),1):min(i1+(ceil(rmin)-1),nelx)
+                    for j2 = max(j1-(ceil(rmin)-1),1):min(j1+(ceil(rmin)-1),nely)
+                        e2 = (k2-1)*nelx*nely + (i2-1)*nely+j2;
                         k = k+1;
                         iH(k) = e1;
                         jH(k) = e2;
@@ -54,25 +53,25 @@ Hs = sum(H,2);
 %% PERIODIC BOUNDARY CONDITIONS
 e0 = eye(6);
 ufixed = zeros(24,6);
-U = zeros(3*(nelz+1)*(nely+1)*(nelx+1),6);
-alldofs = (1:3*(nelz+1)*(nely+1)*(nelx+1)); 
+U = zeros(3*(nely+1)*(nelx+1)*(nelz+1),6);
+alldofs = (1:3*(nely+1)*(nelx+1)*(nelz+1)); 
 n1 = [nodenrs(end,[1,end],1),nodenrs(1,[end,1],1),nodenrs(end,[1,end],end),nodenrs(1,[end,1],end)];
 d1 = reshape([(3*n1-2);(3*n1-1);3*n1],1,24);
 for j = 1:6
-    ufixed(4:6,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;nely;0];
-    ufixed(7:9,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;nely;nelz];
-    ufixed(10:12,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;0;nelz];
-    ufixed(13:15,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;0;0];
-    ufixed(16:18,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;nely;0];
+    ufixed(4:6,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;0;0];
+    ufixed(7:9,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;nely;0];
+    ufixed(10:12,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;nely;0];
+    ufixed(13:15,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;0;nelz];
+    ufixed(16:18,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;0;nelz];
     ufixed(19:21,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;nely;nelz];
-    ufixed(22:24,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[nelx;0;nelz];
+    ufixed(22:24,j) = [e0(1,j),e0(6,j)/2,e0(5,j)/2;e0(6,j)/2,e0(2,j),e0(4,j)/2;e0(5,j)/2,e0(4,j)/2,e0(3,j)]*[0;nely;nelz];
 end
 
 %% INITIALIZE ITERATION
 qe= cell(6,6);
 Q=zeros(6,6);
 dQ = cell(6,6);
-x=initDesMore8tz_3D_righthandRF(nelx,nely,nelz,volfrac,initDes,1);
+x=initDesMore8tz_3D(nelx,nely,nelz,volfrac,initDes,1);
 xPhys = x;
 change = 1;
 loop = 0;
@@ -88,9 +87,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     %top left front corner - top side
     farthestUsedy0x0z0=0;
     xTestedy0x0z0=xPhys(1,farthestUsedy0x0z0+1,1);
-    while (xTestedy0x0z0 > transmiLim && farthestUsedy0x0z0<nely)
+    while (xTestedy0x0z0 > transmiLim && farthestUsedy0x0z0<nelx)
         farthestUsedy0x0z0=farthestUsedy0x0z0+1;
-        if(farthestUsedy0x0z0<nely)
+        if(farthestUsedy0x0z0<nelx)
             xTestedy0x0z0=xPhys(1,farthestUsedy0x0z0+1,1);
         end
     end
@@ -98,9 +97,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     %top left front corner - left side
     farthestUsedx0y0z0=0;
     xTestedx0y0z0=xPhys(farthestUsedx0y0z0+1,1,1);
-    while (xTestedx0y0z0 > transmiLim && farthestUsedx0y0z0<nelz)
+    while (xTestedx0y0z0 > transmiLim && farthestUsedx0y0z0<nely)
         farthestUsedx0y0z0=farthestUsedx0y0z0+1;
-        if(farthestUsedx0y0z0<nelz)
+        if(farthestUsedx0y0z0<nely)
             xTestedx0y0z0=xPhys(farthestUsedx0y0z0+1,1,1);
         end
     end
@@ -108,15 +107,15 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     %top left front corner - depth side
     farthestUsedz0x0y0=0;
     xTestedz0x0y0=xPhys(1,1,farthestUsedz0x0y0+1);
-    while (xTestedz0x0y0 > transmiLim && farthestUsedz0x0y0<nelx)
+    while (xTestedz0x0y0 > transmiLim && farthestUsedz0x0y0<nelz)
         farthestUsedz0x0y0=farthestUsedz0x0y0+1;
-        if(farthestUsedz0x0y0<nelx)
+        if(farthestUsedz0x0y0<nelz)
             xTestedz0x0y0=xPhys(1,1,farthestUsedz0x0y0+1);
         end
     end
     
     %top right front corner - top side
-    farthestUsedy0xMz0=nely+1;
+    farthestUsedy0xMz0=nelx+1;
     xTestedy0xMz0=xPhys(1,farthestUsedy0xMz0-1,1);
     while (xTestedy0xMz0 > transmiLim && farthestUsedy0xMz0>1)
         farthestUsedy0xMz0=farthestUsedy0xMz0-1;
@@ -126,7 +125,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     end
     
     %bottom left front corner - left side
-    farthestUsedx0yMz0=nelz+1;
+    farthestUsedx0yMz0=nely+1;
     xTestedx0yMz0=xPhys(farthestUsedx0yMz0-1,1,1);
     while (xTestedx0yMz0 > transmiLim && farthestUsedx0yMz0>1)
         farthestUsedx0yMz0=farthestUsedx0yMz0-1;
@@ -136,7 +135,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     end
     
     %top left rear corner - depth side
-    farthestUsedzMx0y0=nelx+1;
+    farthestUsedzMx0y0=nelz+1;
     xTestedzMx0y0=xPhys(1,1,farthestUsedzMx0y0-1);
     while (xTestedzMx0y0 > transmiLim && farthestUsedzMx0y0>1)
         farthestUsedzMx0y0=farthestUsedzMx0y0-1;
@@ -147,42 +146,42 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     
     %Make all transmission lengths equal
     lengthtop0=farthestUsedy0x0z0;
-    lengthtopM=nely-farthestUsedy0xMz0+1;
+    lengthtopM=nelx-farthestUsedy0xMz0+1;
     lengthtop=min([lengthtop0, lengthtopM]);
     farthestUsedy0x0z0=round(lengthtop);
-    farthestUsedy0xMz0=nely-round(lengthtop)+1;
+    farthestUsedy0xMz0=nelx-round(lengthtop)+1;
      
     lengthleft0=farthestUsedx0y0z0;
-    lengthleftM=nelz-farthestUsedx0yMz0+1;
+    lengthleftM=nely-farthestUsedx0yMz0+1;
     lengthleft=min([lengthleft0,lengthleftM]);
     farthestUsedx0y0z0=round(lengthleft);
-    farthestUsedx0yMz0=nelz-round(lengthleft)+1;
+    farthestUsedx0yMz0=nely-round(lengthleft)+1;
     
     lengthdepth0=farthestUsedz0x0y0;
-    lengthdepthM=nelx-farthestUsedzMx0y0+1;
+    lengthdepthM=nelz-farthestUsedzMx0y0+1;
     lengthdepth=min([lengthdepth0,lengthdepthM]);
     farthestUsedz0x0y0=round(lengthdepth);
-    farthestUsedzMx0y0=nelx-round(lengthdepth)+1;
+    farthestUsedzMx0y0=nelz-round(lengthdepth)+1;
     
     %make sure no double count
     if (farthestUsedx0y0z0 >= farthestUsedx0yMz0)
-        farthestUsedx0y0z0=floor((nelz)/2);
-        farthestUsedx0yMz0=ceil((nelz)/2)+1;
+        farthestUsedx0y0z0=floor((nely)/2);
+        farthestUsedx0yMz0=ceil((nely)/2)+1;
     end
     if (farthestUsedy0x0z0 >= farthestUsedy0xMz0)
-        farthestUsedy0x0z0=floor((nely)/2);
-        farthestUsedy0xMz0=ceil((nely)/2)+1;
+        farthestUsedy0x0z0=floor((nelx)/2);
+        farthestUsedy0xMz0=ceil((nelx)/2)+1;
     end
     if (farthestUsedz0x0y0 >= farthestUsedzMx0y0)
-        farthestUsedz0x0y0=floor((nelx)/2);
-        farthestUsedzMx0y0=ceil((nelx)/2)+1;
+        farthestUsedz0x0y0=floor((nelz)/2);
+        farthestUsedzMx0y0=ceil((nelz)/2)+1;
     end
     
     % calculation of the nodes associated to the elements corresponding to
     % the transmission zones
     
     %determination if even or odd number of elements
-    if(mod(nelz,2)==0)
+    if(mod(nely,2)==0 && farthestUsedx0y0z0~=0)
         nfarthestUsedx0y0z0=farthestUsedx0y0z0;
         nfarthestUsedx0yMz0=farthestUsedx0yMz0+1;
     else
@@ -190,7 +189,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         nfarthestUsedx0yMz0=farthestUsedx0yMz0;
     end
     
-    if(mod(nely,2)==0)
+    if(mod(nelx,2)==0 && farthestUsedy0x0z0~=0)
         nfarthestUsedy0x0z0=farthestUsedy0x0z0;
         nfarthestUsedy0xMz0=farthestUsedy0xMz0+1;
     else
@@ -198,7 +197,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         nfarthestUsedy0xMz0=farthestUsedy0xMz0;
     end
     
-    if(mod(nelx,2)==0)
+    if(mod(nelz,2)==0 && farthestUsedz0x0y0~=0)
         nfarthestUsedz0x0y0=farthestUsedz0x0y0;
         nfarthestUsedzMx0y0=farthestUsedzMx0y0+1;
     else
@@ -224,11 +223,11 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     d8 = reshape([(3*n8-2);(3*n8-1);3*n8],1,3*size(n8,2));  
     d2 = setdiff(alldofs,[d1,d3,d4,d5,d6,d7,d8]);
 
-    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
-    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
-    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
-    w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nely+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
-    
+    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
+    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
+    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
+    w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
+    % correggere segno
     %% FE-ANALYSIS
     sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
 
@@ -246,20 +245,20 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     U(d5,:) = U(d3,:)+w2;
     U(d6,:) = U(d3,:)+w3;
     U(d8,:) = U(d7,:)+w4;
-  
-    % PLOT DEFORMATIONS
-    if loop==1
-        for i=1:6
-            figure()
-            plot_def_righthandRF(U(:,i),nelx,nely,nelz);
-        end 
-    end
+    
+%     % PLOT DEFORMATIONS
+%     if loop==1
+%         for i=1:6
+%             figure()
+%             plot_def(U(:,i),nelx,nely,nelz);
+%         end 
+%     end
        
     %% OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
     for i = 1:6
         for j = 1:6
             U1 = U(:,i); U2 = U(:,j);
-            qe{i,j} = reshape(sum((U1(edofMat)*KE).*U2(edofMat),2),nelz,nely,nelx)/(nely*nelz*nelx);
+            qe{i,j} = reshape(sum((U1(edofMat)*KE).*U2(edofMat),2),nely,nelx,nelz)/(nelx*nely*nelz);
             Q(i,j) = sum(sum(sum((Emin+xPhys.^penal*(E0-Emin)).*qe{i,j})));
             dQ{i,j} = penal*(E0-Emin)*xPhys.^(penal-1).*qe{i,j};
         end
@@ -268,7 +267,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     c = -(1-cubicity21*(0.5-1/6*cubicity31)-cubicity31*(0.5-1/6*cubicity21))*Q2(1,1)-cubicity21*(0.5-1/6*cubicity31)*Q2(2,2)-cubicity31*(0.5-1/6*cubicity21)*Q2(3,3);
     dQ2=rotateTensorCells_3D(dQ,angle1,angle2,angle3);
     dc = -(1-cubicity21*(0.5-1/6*cubicity31)-cubicity31*(0.5-1/6*cubicity21))*dQ2{1,1}-cubicity21*(0.5-1/6*cubicity31)*dQ2{2,2}-cubicity31*(0.5-1/6*cubicity21)*dQ2{3,3};
-    dv = ones(nelz,nely,nelx);
+    dv = ones(nely,nelx,nelz);
     %% FILTERING/MODIFICATION OF SENSITIVITIES
     if ft==1 %sensitivity
         dc(:) = H*(x(:).*dc(:))./Hs./max(1e-3,x(:));
@@ -310,8 +309,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     %% PRINT RESULTS
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
    clf;
-   %display_3D_righthandRF(xPhys);
-   
+   display_3D(xPhys);
+  
 end
-%toc
-
+toc
