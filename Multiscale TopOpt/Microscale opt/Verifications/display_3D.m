@@ -3,7 +3,7 @@ function display_3D(rho)
 hx = 1; hy = 1; hz = 1;            % User-defined unit element size
 face = [1 2 3 4; 2 6 7 3; 4 3 7 8; 1 5 8 4; 1 2 6 5; 5 6 7 8];
 set(gcf,'Name','ISO display','NumberTitle','off');
-set(gca, 'ZDir','reverse');
+
 
 for k = 1:nelz
     z = (k-1)*hz;
@@ -13,9 +13,9 @@ for k = 1:nelz
         for j = 1:nely
         % for j = round(nely/2):nely % to show half cube cut at y/2
             %y = nely*hy - (j-1)*hy;
-            y = (j-1)*hy;
+            y = nely*hy-(j-1)*hy;
             if (rho(j,i,k) > 0.5)  % User-defined display density threshold
-                vert = [x y z; x y+hx z; x+hx y+hx z; x+hx y z; x y z+hx;x y+hx z+hx; x+hx y+hx z+hx;x+hx y z+hx];
+                vert = [x y z; x y-hx z; x+hx y-hx z; x+hx y z; x y z+hx;x y-hx z+hx; x+hx y-hx z+hx;x+hx y z+hx];
                 vert(:,[2 3]) = vert(:,[3 2]); %vert(:,2,:) = vert(:,2,:);
                 patch('Faces',face,'Vertices',vert,'FaceColor',[0.2+0.8*(1-rho(j,i,k)),0.2+0.8*(1-rho(j,i,k)),0.2+0.8*(1-rho(j,i,k))]);
                 hold on;

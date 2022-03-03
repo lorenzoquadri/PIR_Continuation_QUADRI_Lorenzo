@@ -10,7 +10,7 @@ tic
 volfrac=density;
 cubicity21=sqrt(cubicity21);
 cubicity31=sqrt(cubicity31);
-angle1=angle1*pi/2;
+angle1=angle1*2*pi;
 angle2=angle2*pi/2;
 angle3=angle3*pi/2;
 
@@ -227,7 +227,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
     w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
     w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
-    % correggere segno
+    
     %% FE-ANALYSIS
     sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
 
@@ -246,13 +246,13 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     U(d6,:) = U(d3,:)+w3;
     U(d8,:) = U(d7,:)+w4;
     
-%     % PLOT DEFORMATIONS
-%     if loop==1
-%         for i=1:6
-%             figure()
-%             plot_def(U(:,i),nelx,nely,nelz);
-%         end 
-%     end
+    % PLOT DEFORMATIONS
+    if loop==1
+        for i=1:6
+            figure()
+            plot_def(U(:,i),nelx,nely,nelz);
+        end 
+    end
        
     %% OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
     for i = 1:6
