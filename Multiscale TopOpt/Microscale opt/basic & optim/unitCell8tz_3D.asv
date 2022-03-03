@@ -223,9 +223,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     d8 = reshape([(3*n8-2);(3*n8-1);3*n8],1,3*size(n8,2));  
     d2 = setdiff(alldofs,[d1,d3,d4,d5,d6,d7,d8]);
 
-    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
-    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
-    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
+    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
     w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
     % correggere segno
     %% FE-ANALYSIS

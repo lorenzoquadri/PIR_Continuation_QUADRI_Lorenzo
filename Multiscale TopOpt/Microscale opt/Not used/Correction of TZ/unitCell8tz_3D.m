@@ -1,7 +1,7 @@
 % [tens,obj,micro]=unitCell8tz_3D(5,5,5,0.3,3,1.5,2,0,0,0,0,0,1,0.5);
 %% PERIODIC MATERIAL MICROSTRUCTURE DESIGN
 function [tens,obj,micro]=unitCell8tz_3D(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
-tic
+
 %density : 0 for void, 1 for full material
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
@@ -12,7 +12,7 @@ cubicity21=sqrt(cubicity21);
 cubicity31=sqrt(cubicity31);
 angle1=angle1*pi/2;
 angle2=angle2*pi/2;
-angle3=angle3*pi/2;
+angle3=angle3*2*pi;
 
 %% MATERIAL PROPERTIES
 E0=1;
@@ -181,7 +181,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     % the transmission zones
     
     %determination if even or odd number of elements
-    if(mod(nely,2)==0 && farthestUsedx0y0z0~=0)
+    if(mod(nely,2)==0)
         nfarthestUsedx0y0z0=farthestUsedx0y0z0;
         nfarthestUsedx0yMz0=farthestUsedx0yMz0+1;
     else
@@ -189,7 +189,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         nfarthestUsedx0yMz0=farthestUsedx0yMz0;
     end
     
-    if(mod(nelx,2)==0 && farthestUsedy0x0z0~=0)
+    if(mod(nelx,2)==0)
         nfarthestUsedy0x0z0=farthestUsedy0x0z0;
         nfarthestUsedy0xMz0=farthestUsedy0xMz0+1;
     else
@@ -197,7 +197,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         nfarthestUsedy0xMz0=farthestUsedy0xMz0;
     end
     
-    if(mod(nelz,2)==0 && farthestUsedz0x0y0~=0)
+    if(mod(nelz,2)==0)
         nfarthestUsedz0x0y0=farthestUsedz0x0y0;
         nfarthestUsedzMx0y0=farthestUsedzMx0y0+1;
     else
@@ -205,6 +205,21 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         nfarthestUsedzMx0y0=farthestUsedzMx0y0;
     end
     
+    %moved n, d and wfixed here, to adapt to size of used side of cell
+    
+%     n3_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... %left
+%         reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(nely+1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %bottom
+%         reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,1),[],1)]'; %front
+%     idx3 = ~ismember(n3_with_n1',n1','rows');
+%     n3 = n3_with_n1(idx3);
+%     d3 = reshape([(3*n3-2);(3*n3-1);3*n3],1,3*size(n3,2)); 
+%     n4_with_n1 = [reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,1:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nfarthestUsedx0yMz0:nely+1,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);reshape(permute(nodenrs(1:nfarthestUsedx0y0z0,nelx+1,nfarthestUsedzMx0y0:nelz+1),[3,1,2]),[],1);... % right
+%         reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,1:nfarthestUsedz0x0y0),[2,3,1]),[],1);reshape(permute(nodenrs(1,nfarthestUsedy0xMz0:nelx+1,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);reshape(permute(nodenrs(1,1:nfarthestUsedy0x0z0,nfarthestUsedzMx0y0:nelz+1),[2,3,1]),[],1);... %top
+%         reshape(nodenrs(1:nfarthestUsedx0y0z0,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,1:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely+1,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1);reshape(nodenrs(1:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx+1,nelz+1),[],1)]'; %rear
+%     idx4 = ~ismember(n4_with_n1',n1','rows');
+%     n4 = n4_with_n1(idx4);
+%     d4 = reshape([(3*n4-2);(3*n4-1);3*n4],1,3*size(n4,2)); 
+
     n3 = [reshape(nodenrs(nely+1,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(nely+1,nfarthestUsedy0xMz0:nelx,1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,1,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,1,1),[],1);reshape(permute(nodenrs(nely+1,1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nely+1,1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
     d3 = reshape([(3*n3-2);(3*n3-1);3*n3],1,3*size(n3,2)); 
     n4 = [reshape(nodenrs(1,2:nfarthestUsedy0x0z0,1),[],1);reshape(nodenrs(1,nfarthestUsedy0xMz0:nelx,1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,nelx+1,1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,nelx+1,1),[],1);reshape(permute(nodenrs(nely+1,nelx+1,2:nfarthestUsedz0x0y0),[3,1,2]),[],1);reshape(permute(nodenrs(nely+1,nelx+1,nfarthestUsedzMx0y0:nelz),[3,1,2]),[],1)]';
@@ -222,12 +237,16 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
         reshape(nodenrs(2:nfarthestUsedx0y0z0,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,2:nfarthestUsedy0x0z0,nelz+1),[],1);reshape(nodenrs(nfarthestUsedx0yMz0:nely,nfarthestUsedy0xMz0:nelx,nelz+1),[],1);reshape(nodenrs(2:nfarthestUsedx0y0z0,nfarthestUsedy0xMz0:nelx,nelz+1),[],1)]'; %rear
     d8 = reshape([(3*n8-2);(3*n8-1);3*n8],1,3*size(n8,2));  
     d2 = setdiff(alldofs,[d1,d3,d4,d5,d6,d7,d8]);
-
-    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
-    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
-    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelz+1-nfarthestUsedzMx0y0),1)];
-    w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
-    % correggere segno
+       
+    % wfixed = [repmat(ufixed(4:6,:),(farthestUsedy0x0z0+nelx+1-farthestUsedy0xMz0)*(farthestUsedz0x0y0+nelz+1-farthestUsedzMx0y0)-1,1); repmat(ufixed(10:12,:),(farthestUsedx0y0z0+nely+1-farthestUsedx0yMz0)*(farthestUsedz0x0y0+nelz+1-farthestUsedzMx0y0)-1,1); repmat(ufixed(13:15,:),(farthestUsedx0y0z0+nely+1-farthestUsedx0yMz0)*(farthestUsedz0x0y0+nelx+1-farthestUsedy0xMz0)-1,1)];
+    % wfixed = [repmat(ufixed(4:6,:),(farthestUsedy0x0z0-1+nelx+1-farthestUsedy0xMz0)*(farthestUsedz0x0y0+nely+2-farthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(farthestUsedx0y0z0+nely+2-farthestUsedx0yMz0)*(farthestUsedz0x0y0-1+nelz+1-farthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(farthestUsedx0y0z0+nely+2-farthestUsedx0yMz0)*(farthestUsedz0x0y0-1+nelx+1-farthestUsedy0xMz0),1)];
+    
+    % wfixed = [repmat(ufixed(4:6,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(10:12,:),((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))*((nfarthestUsedz0x0y0)+(nelz+2-nfarthestUsedzMx0y0))-4,1); repmat(ufixed(13:15,:),((nfarthestUsedx0y0z0)+(nely+2-nfarthestUsedx0yMz0))*((nfarthestUsedy0x0z0)+(nelx+2-nfarthestUsedy0xMz0))-4,1)];
+    w1 = [repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(4:6,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w2 = [repmat(ufixed(22:24,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(16:18,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(7:9,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w3 = [repmat(ufixed(13:15,:),(nfarthestUsedy0x0z0-1)+(nelx+1-nfarthestUsedy0xMz0),1);repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1)+(nely+1-nfarthestUsedx0yMz0),1);  repmat(ufixed(10:12,:),(nfarthestUsedz0x0y0-1)+(nelx+1-nfarthestUsedzMx0y0),1)];
+    w4 = [repmat(ufixed(4:6,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedz0x0y0-1+nelz+1-nfarthestUsedzMx0y0),1); repmat(ufixed(10:12,:),(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0)*(nfarthestUsedz0x0y0-1+nely+1-nfarthestUsedzMx0y0),1); repmat(ufixed(13:15,:),(nfarthestUsedx0y0z0-1+nely+1-nfarthestUsedx0yMz0)*(nfarthestUsedy0x0z0-1+nelx+1-nfarthestUsedy0xMz0),1)];
+    
     %% FE-ANALYSIS
     sK = reshape(KE(:)*(Emin+xPhys(:)'.^penal*(E0-Emin)),576*nelx*nely*nelz,1);
 
@@ -246,13 +265,13 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     U(d6,:) = U(d3,:)+w3;
     U(d8,:) = U(d7,:)+w4;
     
-%     % PLOT DEFORMATIONS
-%     if loop==1
-%         for i=1:6
-%             figure()
-%             plot_def(U(:,i),nelx,nely,nelz);
-%         end 
-%     end
+    % PLOT DEFORMATIONS
+    if loop==1
+        for i=1:6
+            figure()
+            plot_def(U(:,i),nelx,nely,nelz);
+        end 
+    end
        
     %% OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
     for i = 1:6
@@ -310,6 +329,7 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
    clf;
    display_3D(xPhys);
-  
+   
 end
-toc
+
+%save('micro.mat','micro');

@@ -3,7 +3,6 @@
 function [tens,obj,micro]=unitCell8tz_3D_righthandRF(nelx,nely,nelz,density,penal,rmin,ft,angle1,angle2,angle3,cubicity21,cubicity31,initDes,transmiLim)
 %tic
 %density : 0 for void, 1 for full material
-%anglePC : 
 %angle : 0 for 0 rad, 1 for pi/4 rads
 %cubicity : 0 for only one privileged direction, 1 for cubic material
 %initDes : initial design : 1=all 0s; 2= all volfrac; 3= all 1; ...

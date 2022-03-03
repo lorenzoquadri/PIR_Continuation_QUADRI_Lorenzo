@@ -859,17 +859,17 @@ else
     error('initDes should be in 1..24')
 end
 %Calculate density
-% count=0;
-% for i=1:nelx
-%     for j=1:nely
-%         for k=1:nelz
-%             if(x(k,j,i)==1)
-%                 count=count+1;
-%             end
-%         end
-%     end
-% end
-% 
-% rho=count/(nelx*nely*nelz);
+count=0;
+for i=1:nelx
+    for j=1:nely
+        for k=1:nelz
+            if(x(i,j,k)==1)
+                count=count+1;
+            end
+        end
+    end
+end
+
+rho=count/(nelx*nely*nelz);
 figure(1)
 display_3D(x)
