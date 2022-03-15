@@ -2,7 +2,7 @@ LHid=fopen('gridNoNoise.txt');
 LHpoints = fscanf(LHid,'%f %f %f %f %f %f',[6 inf]);
 fclose('all')
 initDes=[1,6,9,14,18,21]; % Select best initDes
-parfor j=1:10000
+parfor j=28222
 % for j=1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     j
     locfilename=['point',num2str(j)];

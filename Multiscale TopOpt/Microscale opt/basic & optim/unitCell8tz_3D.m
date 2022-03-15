@@ -246,13 +246,13 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     U(d6,:) = U(d3,:)+w3;
     U(d8,:) = U(d7,:)+w4;
     
-    % PLOT DEFORMATIONS
-    if loop==1
-        for i=1:6
-            figure()
-            plot_def(U(:,i),nelx,nely,nelz);
-        end 
-    end
+%     % PLOT DEFORMATIONS
+%     if loop==1
+%         for i=1:6
+%             figure()
+%             plot_def(U(:,i),nelx,nely,nelz);
+%         end 
+%     end
        
     %% OBJECTIVE FUNCTION AND SENSITIVITY ANALYSIS
     for i = 1:6
