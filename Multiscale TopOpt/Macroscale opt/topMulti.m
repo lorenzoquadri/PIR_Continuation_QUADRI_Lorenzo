@@ -1,4 +1,4 @@
-function [cO,xdensO,xcosO,xsinO,xcubO]=topMulti(nelx,nely,volfrac,initialDesign,problem)
+function [cO,xdensPhys,xcosPhys,xsinPhys,xcubPhys]=topMulti(nelx,nely,volfrac,initialDesign,problem)
 % USER-DEFINED MODEL PARAMETERS
 %nelx : number of cells in horizontal direction
 %nely : number of cells in vertical direction
@@ -10,7 +10,7 @@ xMax = 1; %maximum cell density
 
 
 global B database sig; 
-sig=0.04; %gaussion kernel radius
+sig=0.15; %gaussion kernel radius
 B = func_B();
 load('database32-32-32.mat'); % cell elastic tensor database
 database=dbMat;

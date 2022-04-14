@@ -12,12 +12,10 @@ xMax = 1; %maximum cell density
 
 
 global B database sig;
-sig=0.15; %gaussion kernel radius
+sig=0.07; %gaussion kernel radius
 B = func_B();
-load('database11-17-9-17-7-7.mat'); % cell elastic tensor database
+load('database11-17-17-17-7-7.mat'); % cell elastic tensor database
 database=dbMat;
-
-
 
 % USER-DEFINED LOOP PARAMETERS
 maxloopaftermin=5; % Maximum number of iterations without a new global minimum
@@ -40,12 +38,12 @@ switch problem
     %     activeelts=ones(nelx*nely,1); %%%
     case 'Canti'
         % USER-DEFINED LOAD DOFs
-        %[il1,jl1,kl1] = meshgrid(nelx,0,0:nelz);                  % Coordinates
-        [il1,jl1,kl1] = meshgrid(0:nelx,nely:-1:0,0:nelz);
+        [il1,jl1,kl1] = meshgrid(nelx,0,0:nelz);                  % Coordinates
         loadnid = kl1*(nelx+1)*(nely+1)+il1*(nely+1)+(nely+1-jl1); % Node IDs
-        loaddof = 3*loadnid(:) ; % DOFs
+        loaddof = 3*loadnid(:)-1 ; % DOFs
         % USER-DEFINED SUPPORT FIXED DOFs
-        [if1,jf1,kf1] = meshgrid(0,0:nely,0:nelz);                  % Coordinates
+        %[if1,jf1,kf1] = meshgrid(0,0:nely,0:nelz);                  % Coordinates
+        [if1,jf1,kf1] = meshgrid(0,nely:-1:0,0:nelz);
         fixednid_1 = kf1*(nelx+1)*(nely+1)+if1*(nely+1)+(nely+1-jf1); % Node IDs
         fixeddof = [3*fixednid_1(:)-2; 3*fixednid_1(:)-1; 3*fixednid_1(:)]; % DOFs
         % USER-DEFINED ACTIVE ELEMENTS
@@ -278,14 +276,14 @@ while change > tolx && loop < maxloop && loopaftermin < maxloopaftermin
     
     figure(6)
     title('cos3 of cells')
-    display_3D((1-xcos3Phys).*reshape(activeelts,nely,nelx,nelz));
+    display_3D((xcos3Phys).*reshape(activeelts,nely,nelx,nelz));
     figure(7)
     title('sin3 of cells')
     display_3D(xsin3Phys.*reshape(activeelts,nely,nelx,nelz));
     
     figure(8)
     title('cub21 of cells')
-    display_3D((1-xcub21Phys).*reshape(activeelts,nely,nelx,nelz));
+    display_3D((xcub21Phys).*reshape(activeelts,nely,nelx,nelz));
     figure(9)
     title('cub31 of cells')
     display_3D(xcub31Phys.*reshape(activeelts,nely,nelx,nelz));end
@@ -364,8 +362,9 @@ cosalpha1=2*xcos1-1; sinalpha1=2*xsin1-1;
 xo1r=atan(sinalpha1/cosalpha1)/pi; %Here, xor is in [-1,1], representing an orientation angle in [-pi,pi]
 %put the orientation angle in [0,pi]
 if xo1r<0
-    xo1r=xo1r+1;
+    xo1r=xo1r+2;
 end
+xo1r=xo1r/2;
 xo1rd=xo1r+0.01; %xcor+delta used to get the partial derivatives
 negdifor1=1;
 if xo1rd>1 %if right partial derivative isn't accessible, get left partial derivative
@@ -378,8 +377,9 @@ cosalpha2=2*xcos2-1; sinalpha2=2*xsin2-1;
 xo2r=atan(sinalpha2/cosalpha2)/pi; %Here, xor is in [-1,1], representing an orientation angle in [-pi,pi]
 %put the orientation angle in [0,pi]
 if xo2r<0
-    xo2r=xo2r+1;
+    xo2r=xo2r+2;
 end
+xo2r=xo2r/2;
 xo2rd=xo2r+0.01; %xcor+delta used to get the partial derivatives
 negdifor2=1;
 if xo2rd>1 %if right partial derivative isn't accessible, get left partial derivative
@@ -392,8 +392,9 @@ cosalpha3=2*xcos3-1; sinalpha3=2*xsin3-1;
 xo3r=atan(sinalpha3/cosalpha3)/pi; %Here, xor is in [-1,1], representing an orientation angle in [-pi,pi]
 %put the orientation angle in [0,pi]
 if xo3r<0
-    xo3r=xo3r+1;
+    xo3r=xo3r+2;
 end
+xo3r=xo3r/2;
 xo3rd=xo3r+0.01; %xcor+delta used to get the partial derivatives
 negdifor3=1;
 if xo3rd>1 %if right partial derivative isn't accessible, get left partial derivative
@@ -512,6 +513,7 @@ D_dxor3_array=D_dx{4};
 D_dxcub21_array=D_dx{5};
 D_dxcub31_array=D_dx{6};
 
+D=array2matrix(D_1);
 D_dxdens=array2matrix(D_dxdens_array);
 D_dxor1=array2matrix(D_dxor1_array);
 D_dxor2=array2matrix(D_dxor2_array);
@@ -534,7 +536,8 @@ ke_dxcub31 = zeros(24);
 [i, j, k] = meshgrid(1:3, 1:3, 1:3);
 
 for m = 1:27
-    ke = ke + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxdens * B(x(i(m)),  x(j(m)), x(k(m)));
+    ke = ke + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D * B(x(i(m)),  x(j(m)), x(k(m)));
+    ke_dxdens = ke_dxdens + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxdens * B(x(i(m)),  x(j(m)), x(k(m)));
     ke_dxor1 = ke_dxor1 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor1 * B(x(i(m)), x(j(m)), x(k(m)));
     ke_dxor2 = ke_dxor2 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor2 * B(x(i(m)), x(j(m)), x(k(m)));
     ke_dxor3 = ke_dxor3 + w(i(m))*w(j(m))*w(k(m))*B(x(i(m)), x(j(m)), x(k(m)))' * D_dxor3 * B(x(i(m)), x(j(m)), x(k(m)));

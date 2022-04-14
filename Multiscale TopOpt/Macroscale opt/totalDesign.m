@@ -1,10 +1,11 @@
-function [totalMat]=totalDesign(xdens,xcos,xsin,xcub,nelx,nely,totvolfrac,posttreat,problem)
+function [totalMat]=totalDesign(xdens,xcos1,xsin1,xcos2,xsin2,xcos3,xsin3,xcub21,xcub31,nelx,nely,nelz,totvolfrac,posttreat,problem)
 % totvolfrac : total volume fraction
 % nelx : number of cells in horizontal direction
 % nely : number of cells in vertical direction
 % posttreat : 1 if post treatment (better design); 0 without (faster)
-microx=100; % number of elements in horizontal direction per cell
-microy=100; % number of elements in vertical direction per cell
+microx=9; % number of elements in horizontal direction per cell
+microy=9; % number of elements in vertical direction per cell
+microz=9; % number of elements in depth direction per cell
 
 load('DBstru1.mat') % microstructure database
 load('DBstru2.mat') % microstructure database

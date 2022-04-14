@@ -13,7 +13,6 @@ cubicity31=sqrt(cubicity31);
 angle1=angle1*2*pi;
 angle2=angle2*pi/2;
 angle3=angle3*pi/2;
-
 %% MATERIAL PROPERTIES
 E0=1;
 Emin=1e-9;
@@ -310,6 +309,9 @@ while (change > 0.01 && loop < 200 && inLoop==1) || inLoop==2
     fprintf(' It.:%5i Obj.:%11.4f Vol.:%7.3f ch.:%7.3f\n',loop,c, mean(xPhys(:)),change);
    clf;
    display_3D(xPhys);
-  
 end
+
+% Visualise homogenised stiffness tensor
+figure()
+visual(tens)
 toc

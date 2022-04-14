@@ -14,7 +14,7 @@ for k = 1:nelz
         % for j = round(nely/2):nely % to show half cube cut at y/2
             %y = nely*hy - (j-1)*hy;
             y = nely*hy-(j-1)*hy;
-            if (rho(j,i,k) > 0)  % User-defined display density threshold
+            if (rho(j,i,k) > 0.5)  % User-defined display density threshold
                 vert = [x y z; x y-hx z; x+hx y-hx z; x+hx y z; x y z+hx;x y-hx z+hx; x+hx y-hx z+hx;x+hx y z+hx];
                 vert(:,[2 3]) = vert(:,[3 2]); %vert(:,2,:) = vert(:,2,:);
                 patch('Faces',face,'Vertices',vert,'FaceColor',[0.2+0.8*(1-rho(j,i,k)),0.2+0.8*(1-rho(j,i,k)),0.2+0.8*(1-rho(j,i,k))]);
